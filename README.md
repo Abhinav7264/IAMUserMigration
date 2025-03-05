@@ -1,5 +1,6 @@
 
-![AWS IAM](https://img.shields.io/badge/AWS-IAM-orange?logo=amazonaws) ![Bash](https://img.shields.io/badge/Script-Bash-green?logo=gnu-bash)  
+![PORTFOLIO PROJECTS_AWS - MODULE 2_ARCHITECTURE](https://github.com/user-attachments/assets/40c8b0f1-947c-4d75-a53d-86a96bfc4107)
+
 # 🔐 AWS IAM User Migration & Security Hardening  
 
 
