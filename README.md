@@ -1,3 +1,5 @@
+
+![PORTFOLIO PROJECTS_AWS - MODULE 2_ARCHITECTURE](https://github.com/user-attachments/assets/5ff69888-f8fa-4c7f-ae94-1a6cdb15f2f8)
 # 🔐 AWS IAM User Migration & Security Hardening
 
 ## 📋 Overview
