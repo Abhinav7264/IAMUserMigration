@@ -31,20 +31,19 @@ This project automates the migration of **100+ users** to AWS IAM using a CSV fi
 
 ### Prerequisites  
 - [x] **AWS CLI** configured with admin permissions.  
-- [x] **CSV file** formatted as `user,group,password` (see [`users.csv`](./users.csv)).  
+- [x] **CSV file** formatted as `user,group,password` (see [`users.csv`]).  
 - [x] **Bash environment** (AWS CloudShell, GitBash, or Linux terminal).  
 - [x] `dos2unix` tool installed.  
 
 ## 🛠️ Step-by-Step Guide  
 
 ### 1. Prepare the CSV File  
-**Template**: [`IT_Team_ABC-Company.xlsx`](./IT_Team_ABC-Company.xlsx)  
+**Template**: `IT_Team_ABC-Company.xlsx`  
 **Modifications**:  
 - Rename columns to `user`, `group`, and `password`.  
 - Remove `@abc-company.com` from email addresses.  
 - Add temporary passwords (e.g., `ChangeMe123456!`).
-- change the groups according to![PORTFOLIO PROJECTS_AWS - MODULE 2_ARCHITECTURE](https://github.com/user-attachments/assets/6489622b-a84e-4cbf-8074-b9fbbeb8c537)
- what already exist in IAM.
+- change the groups according to what already exist in IAM.
 - Save as `users.csv` (UTF-8 encoding).  
 
 **Example CSV Format**:  
