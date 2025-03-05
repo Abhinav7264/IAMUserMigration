@@ -1,180 +1,170 @@
+# 🔐 AWS IAM User Migration & Security Hardening
 
-![PORTFOLIO PROJECTS_AWS - MODULE 2_ARCHITECTURE](https://github.com/user-attachments/assets/40c8b0f1-947c-4d75-a53d-86a96bfc4107)
-
-# 🔐 AWS IAM User Migration & Security Hardening  
-
-
-## 📋 Overview  
-This project automates the migration of **100+ users** to AWS IAM using a CSV file and Bash scripting, while enforcing security best practices like **MFA** and **password policies**.  
+## 📋 Overview
+This project automates the migration of **100+ users** to AWS IAM using a **CSV file** and **Bash scripting** while enforcing security best practices like **MFA** and **password policies**.
 
 ---
 
-## 🚀 Quick Start  
+## 🚀 Quick Start
 
-### 📂 Create a Folder (`aws-mod2`) and Download Files  
-**Required Files**:  
+### 📂 Folder Structure (`aws-mod2`)
+| File                  | Purpose                         |
+|-----------------------|---------------------------------|
+| `IT_Team_ABC-Company.xlsx` | Source spreadsheet for user data 📄 |
+| `force_mfa_policy.json` | IAM policy to enforce MFA 🔒 |
+| `users.csv`           | Processed CSV input 📊         |
+| `aws-iam-create-user.sh` | Bash script to automate user creation 🛠️ |
 
-- 📄 `IT_Team_ABC-Company.xlsx`  
-  - **Purpose**: Source spreadsheet for user data.  
-  - **Note**: Edit this file to match CSV requirements.  
-
-- 🔒 `force_mfa_policy.txt`  
-  - **Purpose**: IAM policy enforcing MFA for all users.  
-
-- 📊 `users.csv`  
-  - **Purpose**: Processed CSV input for the automation script.  
-  - **Format**: `user,group,password`.  
-
-- 🛠️ `aws-iam-create-user.sh`  
-  - **Purpose**: Bash script to automate user creation.  
 ---
 
-### Prerequisites  
-- [x] **AWS CLI** configured with admin permissions.  
-- [x] **CSV file** formatted as `user,group,password` (see [`users.csv`]).  
-- [x] **Bash environment** (AWS CloudShell, GitBash, or Linux terminal).  
-- [x] `dos2unix` tool installed.  
+## ✅ Prerequisites
+- AWS CLI configured with **admin permissions** 🔑
+- CSV file formatted as `user,group,password`
+- Bash environment (**AWS CloudShell**, **GitBash**, or **Linux terminal**)
+- `dos2unix` installed (for Windows compatibility)
 
-## 🛠️ Step-by-Step Guide  
+---
 
-### 1. Prepare the CSV File  
-**Template**: `IT_Team_ABC-Company.xlsx`  
-**Modifications**:  
-- Rename columns to `user`, `group`, and `password`.  
-- Remove `@abc-company.com` from email addresses.  
-- Add temporary passwords (e.g., `ChangeMe123456!`).
-- change the groups according to what already exist in IAM.
-- Save as `users.csv` (UTF-8 encoding).  
+## 🔑 CSV File Preparation
 
-**Example CSV Format**:  
+### Template: `IT_Team_ABC-Company.xlsx`
+| Column    | Example           |
+|-----------|------------------|
+| user      | michael.scott    |
+| group     | NetworkAdmin     |
+| password  | ChangeMe123456!  |
 
-| user                  | group         | password          |  
-|-----------------------|---------------|-------------------|  
-| barbara.brown         | CloudAdmin    | ChangeMe123456!   |  
-| michael.scott         | NetworkAdmin  | ChangeMe123456!   |  
-| brian.garcia          | LinuxAdmin    | ChangeMe123456!   |  
+- Remove **@abc-company.com** from emails.
+- Add temporary passwords like **ChangeMe123456!**.
+- Save as **`users.csv`** (UTF-8 encoding).
 
+---
 
-# AWS Cloud Shell  [ It already comes with AWS CLI installed! ]
+## ⚙️ AWS CloudShell Setup
 
-1. Access **AWS Cloud Shell**
-2. Install '**dos2unix**' 
+1. Access **AWS CloudShell**.
+2. Install `dos2unix`:
 
 ```bash
 sudo yum install dos2unix -y
 ```
-3. Script Download
+
+3. Download the Bash Script:
 
 ```bash
 wget https://tcb-bootcamps.s3.amazonaws.com/bootcamp-aws/en/aws-iam-create-user.sh
 ```
 
-4. Change script’s permissions
+4. Grant Execution Permissions:
 
 ```bash
-ls -la
 chmod +x aws-iam-create-user.sh
-ls -la
 ```
 
-5. Upload 'users2.csv' file
+5. Upload your `users.csv` file and validate:
 
 ```bash
-# validating file content
-
 cat users.csv
 ```
 
+---
 
-# Run the Script
+## ▶️ Run the Script
+
 ```bash
-# Make the script executable
-chmod +x aws-iam-create-user.sh
-
-# Execute with CSV input
 ./aws-iam-create-user.sh users.csv
-````
-# :white_check_mark: **Verification**
+```
 
-````bash
-# List all users
+### ✅ Verification
+
+```bash
 aws iam list-users
 aws iam get-group --group-name CloudAdmin
-````
+```
 
+---
 
-## Attach Policy to allow users to change their passwords:
-Step 1: List All IAM Groups
-First, retrieve the names of all IAM user groups in your account:
+## 🔑 Allow Users to Change Passwords
 
-````bash
-aws iam list-groups --query "Groups[*].GroupName" --output text
-````
-Save the output to a file (e.g., groups.txt):
+### Attach `IAMUserChangePassword` Policy to All Groups
 
-````bash
+1. List all groups:
+
+```bash
 aws iam list-groups --query "Groups[*].GroupName" --output text | tr '\t' '\n' > groups.txt
-````
-#### Step 2: Attach the Policy to All Groups
-Run this script to attach the policy to every group listed in groups.txt:
+```
 
-````bash
+2. Attach Policy:
+
+```bash
 POLICY_ARN="arn:aws:iam::aws:policy/IAMUserChangePassword"
 
 while read GROUP; do
   aws iam attach-group-policy \
     --group-name "$GROUP" \
     --policy-arn "$POLICY_ARN"
-  echo "Attached IAMUserChangePassword to group: $GROUP"
+  echo "🔑 Attached IAMUserChangePassword to group: $GROUP"
 done < groups.txt
-````
+```
 
+---
 
-### Let’s test user access
+## 🔐 Enforce MFA
+### Enable MFA for Root User
+1.	Navigate to AWS IAM Console → Dashboard.
+2.	Click on Activate MFA on your root account.
+3.	Select Virtual MFA device and click Continue.
+4.	Open Google Authenticator (or similar app) and scan the QR code.
+5.	Enter the two consecutive MFA codes displayed on your device.
+6.	Click Assign MFA to complete the process.
 
-- **IAM** | **Dashboard** | **copy URL**
-- Open an 'anonymous / private' tab in another browser and access it with the URL 
-try logging in with any username and change password when it prompt from [ **ChangeMe123456!** to **ChangeMe123456!*@*** ]
+### Create Custom MFA Enforcement Policy
 
+1. Navigate to **IAM → Policies → Create Policy**.
+2. Use the content from **`force_mfa_policy.json`**.
+3. Name the policy **EnforceMFAPolicy**.
 
-#### Enable MFA on your root user
-- **Google Authenticator**
-- Generate token and validate access using a second authentication factor
-**Activate MFA** | **Virtual MFA device**
-Open the authenticator app, and add an 'account' | Read QRCode | Wait for two consecutive tokens to be generated.
+### Attach MFA Policy to All Groups
 
-#### Enable MFA for All Users
-Step 1: Create and Attach MFA Enforcement Policy
-#### Create Custom Policy in AWS IAM:
-Navigate to IAM > Policies > Create Policy
-Use the JSON content from force_mfa_policy.txt
-Name the policy EnforceMFAPolicy
-
-#### Attach Policy to Groups:
-
-````bash
-# Ensure groups.txt contains target IAM groups (one per line)
-# Example groups.txt:
-# CloudAdmin
-# DBA
-# NetworkAdmin
+```bash
+POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='EnforceMFAPolicy'].Arn" --output text)
 
 while read -r GROUP; do
-  POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='EnforceMFAPolicy'].Arn" --output text)
   aws iam attach-group-policy \
     --group-name "$GROUP" \
     --policy-arn "$POLICY_ARN"
   echo "✅ Attached EnforceMFAPolicy to group: $GROUP"
 done < groups.txt
-````
+```
 
-🛡️ What This Does
-🔐 Denies access to all AWS services unless MFA is active
+### 🔄 What This Does
+| Feature        | Description                |
+|---------------|---------------------------|
+| 🔐 MFA        | Denies access unless MFA is active |
+| 📋 Group-Based | Applies to all users in the specified groups |
+| 🚀 Automated   | Uses AWS CLI to attach the policy |
 
-📌 Applies to all IAM groups specified in groups.txt
+---
 
-🔄 Automated attachment using AWS CLI
+### 🎯 Testing User Access
+1. Login via IAM **Dashboard URL**.
+2. Use temporary password.
+3. Update password at first login.
+4. Enable **Virtual MFA** using Google Authenticator.
 
+---
 
-That's all folks
+## 🛡️ Security Recap
+| Feature    | Status |
+|------------|-------|
+| User Migration | ✅ Completed |
+| Password Policy | ✅ Enforced |
+| MFA        | ✅ Mandatory |
+| IAM User Permissions | 🔐 Restricted |
+
+---
+
+### 🎉 That's All, Folks! 🦸‍♀️🦸‍♂️
+Automated. Secure. Scalable.
+
 
